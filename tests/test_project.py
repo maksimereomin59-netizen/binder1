@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -53,6 +54,15 @@ class ProjectLayoutTests(unittest.TestCase):
     def test_reserved_in_keyword_is_not_used_as_variable(self) -> None:
         bundle = build.render_bundle()
         self.assertNotRegex(bundle, r"(?m)\b(?:try\s+)?in\s*:=")
+
+    def test_all_icon_references_are_defined(self) -> None:
+        bundle = build.render_bundle()
+        theme = build.read_ahk_source("src/ui/Theme.ahk")
+        icon_class = re.search(r"(?ms)^class Icon\s*\{(.*?)^\}", theme)
+        self.assertIsNotNone(icon_class, "Icon class is missing")
+        defined = set(re.findall(r"(?m)^\s*static\s+(\w+)\s*(?::=|\()", icon_class.group(1)))
+        referenced = set(re.findall(r"\bIcon\.(\w+)", bundle))
+        self.assertFalse(referenced - defined, f"undefined icons: {sorted(referenced - defined)}")
 
 
 if __name__ == "__main__":

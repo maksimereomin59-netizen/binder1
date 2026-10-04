@@ -1101,6 +1101,7 @@ class Icon {
     static Copy := Chr(0xE8C8)
     static Delete := Chr(0xE74D)
     static Keyboard := Chr(0xE765)
+    static Doc := Chr(0xE8A5)
     static Cancel := Chr(0xE711)
     static Down := Chr(0xE70D)
     static Undo := Chr(0xE7A7)
