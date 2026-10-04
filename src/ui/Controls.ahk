@@ -143,12 +143,14 @@ class Btn {
         r := p.h >= 36 ? 9 : p.h >= 28 ? 7 : 6
         this.Plate := g.AddText("x" p.x " y" p.y " w" p.w " h" p.h " +0x100 +0x4000000 Background" bg)
         Theme.Round(this.Plate, p.w, p.h, r)
-        this.Ic := UI.Text(g, "x" p.x " y" p.y " w18 h" p.h " +0x200 Center", glyph, bg, size, fg, 400, Icon.Font)
-        this.Lb := UI.Text(g, "x" p.x " y" p.y " w" p.w " h" p.h " +0x200 Center", label, bg, size, fg, 600)
+        this.Ic := UI.Text(g, "x" p.x " y" p.y " w18 h" p.h " +0x100 +0x200 Center", glyph, bg, size, fg, 400, Icon.Font)
+        this.Lb := UI.Text(g, "x" p.x " y" p.y " w" p.w " h" p.h " +0x100 +0x200 Center", label, bg, size, fg, 600)
         this.Parts := [this.Plate, this.Ic, this.Lb]
-        this.Plate.OnEvent("Click", ObjBindMethod(this, "Fire"))
         this.Hv := PaintHover(this.Parts, bg, hv, pr)
-        Hover.Add(this.Plate, this.Hv, g.Hwnd)
+        for c in this.Parts {
+            c.OnEvent("Click", ObjBindMethod(this, "Fire"))
+            Hover.Add(c, this.Hv, g.Hwnd)
+        }
         this.Layout(label, glyph)
     }
 
@@ -215,10 +217,10 @@ class SwitchCtl {
         this.OnColor := onColor = "" ? Theme.Accent : onColor
         this.Track := g.AddText("x" x " y" (y + 3) " w40 h22 +0x100 +0x4000000 Background" Theme.Line)
         Theme.Round(this.Track, 40, 22, 11)
-        this.Knob := g.AddText("x" (x + 3) " y" (y + 6) " w16 h16 BackgroundFFFFFF")
+        this.Knob := g.AddText("x" (x + 3) " y" (y + 6) " w16 h16 +0x100 BackgroundFFFFFF")
         Theme.Round(this.Knob, 16, 16, 8)
         this.Lbl := UI.Text(g, "x" (x + 52) " y" y " w" (w - 52) " h28 +0x200 +0x100", label, bg, 10, Theme.Soft, 500)
-        for c in [this.Track, this.Lbl]
+        for c in [this.Track, this.Knob, this.Lbl]
             c.OnEvent("Click", ObjBindMethod(this, "Flip"))
         this.KX := this.State ? 21 : 3
         this.AnimFn := ObjBindMethod(this, "Anim")
@@ -264,14 +266,15 @@ class Picker {
         this.IconFn := iconFn, this.OnChange := 0
         this.Fr := UI.Frame(g, x, y, w, h, Theme.Field, 8)
         off := iconFn ? 36 : 12
-        this.I := UI.IconText(g, "x" (x + 12) " y" (y + 1) " w18 h" (h - 2), "", Theme.Field, 10, Theme.Accent)
+        this.I := UI.IconText(g, "x" (x + 12) " y" (y + 1) " w18 h" (h - 2) " +0x100", "", Theme.Field, 10, Theme.Accent)
         this.I.Visible := !!iconFn
         this.T := UI.Text(g, "x" (x + off) " y" (y + 1) " w" (w - off - 34) " h" (h - 2) " +0x200 +0x100", value, Theme.Field, 10, Theme.Text, 500)
         this.A := UI.IconText(g, "x" (x + w - 32) " y" (y + 1) " w24 h" (h - 2) " +0x100", Icon.Down, Theme.Field, 8, Theme.Muted)
-        for c in [this.T, this.A]
+        for c in [this.I, this.T, this.A]
             c.OnEvent("Click", ObjBindMethod(this, "Open"))
         hv := {Enter: (*) => UI.Paint(this.Fr.o, Theme.LineHover), Leave: (*) => UI.Paint(this.Fr.o, Theme.Line)}
-        Hover.Add(this.T, hv, g.Hwnd), Hover.Add(this.A, hv, g.Hwnd)
+        for c in [this.I, this.T, this.A]
+            Hover.Add(c, hv, g.Hwnd)
         this.Set(value, false)
     }
     Open(*) {

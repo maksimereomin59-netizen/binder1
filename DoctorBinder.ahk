@@ -995,19 +995,19 @@ class Theme {
     static Mono := "Consolas"
 
     ; поверхности
-    static Bg := "0B0E13"
-    static Side := "0D1218"
-    static Card := "11161D"
-    static CardHover := "161C25"
-    static CardSel := "0D2129"
-    static Field := "151B24"
-    static FieldHover := "1C2430"
-    static ChatBg := "090C11"
-    static Gutter := "151A21"
+    static Bg := "0A0E13"
+    static Side := "0E141A"
+    static Card := "141C24"
+    static CardHover := "19242D"
+    static CardSel := "141C24"
+    static Field := "19232D"
+    static FieldHover := "202C37"
+    static ChatBg := "0C1218"
+    static Gutter := "151D24"
     ; линии
-    static Line := "1F2937"
-    static LineHover := "2C3A4C"
-    static KeyLine := "2A3646"
+    static Line := "26323B"
+    static LineHover := "354651"
+    static KeyLine := "334751"
     ; текст
     static Text := "E8EDF4"
     static Soft := "C2CBD8"
@@ -1414,12 +1414,14 @@ class Btn {
         r := p.h >= 36 ? 9 : p.h >= 28 ? 7 : 6
         this.Plate := g.AddText("x" p.x " y" p.y " w" p.w " h" p.h " +0x100 +0x4000000 Background" bg)
         Theme.Round(this.Plate, p.w, p.h, r)
-        this.Ic := UI.Text(g, "x" p.x " y" p.y " w18 h" p.h " +0x200 Center", glyph, bg, size, fg, 400, Icon.Font)
-        this.Lb := UI.Text(g, "x" p.x " y" p.y " w" p.w " h" p.h " +0x200 Center", label, bg, size, fg, 600)
+        this.Ic := UI.Text(g, "x" p.x " y" p.y " w18 h" p.h " +0x100 +0x200 Center", glyph, bg, size, fg, 400, Icon.Font)
+        this.Lb := UI.Text(g, "x" p.x " y" p.y " w" p.w " h" p.h " +0x100 +0x200 Center", label, bg, size, fg, 600)
         this.Parts := [this.Plate, this.Ic, this.Lb]
-        this.Plate.OnEvent("Click", ObjBindMethod(this, "Fire"))
         this.Hv := PaintHover(this.Parts, bg, hv, pr)
-        Hover.Add(this.Plate, this.Hv, g.Hwnd)
+        for c in this.Parts {
+            c.OnEvent("Click", ObjBindMethod(this, "Fire"))
+            Hover.Add(c, this.Hv, g.Hwnd)
+        }
         this.Layout(label, glyph)
     }
 
@@ -1486,10 +1488,10 @@ class SwitchCtl {
         this.OnColor := onColor = "" ? Theme.Accent : onColor
         this.Track := g.AddText("x" x " y" (y + 3) " w40 h22 +0x100 +0x4000000 Background" Theme.Line)
         Theme.Round(this.Track, 40, 22, 11)
-        this.Knob := g.AddText("x" (x + 3) " y" (y + 6) " w16 h16 BackgroundFFFFFF")
+        this.Knob := g.AddText("x" (x + 3) " y" (y + 6) " w16 h16 +0x100 BackgroundFFFFFF")
         Theme.Round(this.Knob, 16, 16, 8)
         this.Lbl := UI.Text(g, "x" (x + 52) " y" y " w" (w - 52) " h28 +0x200 +0x100", label, bg, 10, Theme.Soft, 500)
-        for c in [this.Track, this.Lbl]
+        for c in [this.Track, this.Knob, this.Lbl]
             c.OnEvent("Click", ObjBindMethod(this, "Flip"))
         this.KX := this.State ? 21 : 3
         this.AnimFn := ObjBindMethod(this, "Anim")
@@ -1535,14 +1537,15 @@ class Picker {
         this.IconFn := iconFn, this.OnChange := 0
         this.Fr := UI.Frame(g, x, y, w, h, Theme.Field, 8)
         off := iconFn ? 36 : 12
-        this.I := UI.IconText(g, "x" (x + 12) " y" (y + 1) " w18 h" (h - 2), "", Theme.Field, 10, Theme.Accent)
+        this.I := UI.IconText(g, "x" (x + 12) " y" (y + 1) " w18 h" (h - 2) " +0x100", "", Theme.Field, 10, Theme.Accent)
         this.I.Visible := !!iconFn
         this.T := UI.Text(g, "x" (x + off) " y" (y + 1) " w" (w - off - 34) " h" (h - 2) " +0x200 +0x100", value, Theme.Field, 10, Theme.Text, 500)
         this.A := UI.IconText(g, "x" (x + w - 32) " y" (y + 1) " w24 h" (h - 2) " +0x100", Icon.Down, Theme.Field, 8, Theme.Muted)
-        for c in [this.T, this.A]
+        for c in [this.I, this.T, this.A]
             c.OnEvent("Click", ObjBindMethod(this, "Open"))
         hv := {Enter: (*) => UI.Paint(this.Fr.o, Theme.LineHover), Leave: (*) => UI.Paint(this.Fr.o, Theme.Line)}
-        Hover.Add(this.T, hv, g.Hwnd), Hover.Add(this.A, hv, g.Hwnd)
+        for c in [this.I, this.T, this.A]
+            Hover.Add(c, hv, g.Hwnd)
         this.Set(value, false)
     }
     Open(*) {
@@ -2039,16 +2042,16 @@ class MainUI {
     static G := 0
     static W := 1200
     static H := 700
-    static SW := 232          ; ширина сайдбара
-    static PW := 316          ; ширина правой панели
+    static SW := 220          ; компактная навигация
+    static PW := 300          ; правая панель не забирает ширину у списка
     static PX := 0
     static CX := 0
     static CW := 0
-    static LT := 120          ; верх списка карточек
-    static STEP := 70
-    static CH := 62
-    static NavTop := 98
-    static NavStep := 32
+    static LT := 126          ; верх списка карточек
+    static STEP := 74
+    static CH := 68
+    static NavTop := 136
+    static NavStep := 31
     static CardN := 7
     static NavN := 8
     static Cards := []
@@ -2088,11 +2091,11 @@ class MainUI {
         ww := (r - l) / s, wh := (b - t) / s
         this.W := Round(Min(1280, ww - 16, Max(1024, ww - 120)))
         this.H := Round(Min(820, wh - 16, Max(560, wh - 60)))
-        this.PW := this.W >= 1240 ? 316 : 292
+        this.PW := this.W >= 1180 ? 300 : 276
         this.CX := this.SW + 24
         this.PX := this.W - this.PW - 16
         this.CW := this.PX - 16 - this.CX
-        this.NavN := Max(4, Min(9, (this.H - 320) // this.NavStep))
+        this.NavN := Max(4, Min(10, (this.H - 320) // this.NavStep))
         this.CardN := Max(3, (this.H - 56 - this.LT) // this.STEP)
     }
 
@@ -2100,242 +2103,239 @@ class MainUI {
         Theme.Init()
         this.Layout()
         S := Theme.Side, B := Theme.Bg, C := Theme.Card, W := this.W, H := this.H
-        g := Gui("-MaximizeBox", App.Name " " App.Version)
+        g := Gui("-Resize -MaximizeBox", App.Name " " App.Version)
         g.BackColor := B
         g.MarginX := 0, g.MarginY := 0
         this.G := g
 
-        ; ================= сайдбар =================
+        ; ================= навигация =================
         UI.Box(g, 0, 0, this.SW, H, S, 0)
         UI.Box(g, this.SW, 0, 1, H, Theme.Line, 0)
-        lg := UI.IconText(g, "x18 y18 w36 h36", Icon.Cat["health"], Theme.AccentSoft, 14, Theme.Accent)
-        Theme.Round(lg, 36, 36, 10)
-        UI.Text(g, "x64 y16 w150 h20", "MedBind", S, 13, Theme.Text, 700)
-        UI.Text(g, "x64 y37 w150 h14", "Doctor Binder", S, 8, Theme.Muted)
+        this.LogoIcon := UI.IconText(g, "x16 y16 w38 h38", Icon.Cat["health"], Theme.AccentSoft, 15, Theme.Accent)
+        Theme.Round(this.LogoIcon, 38, 38, 12)
+        UI.Text(g, "x64 y17 w140 h22", "MedBind", S, 14, Theme.Text, 700)
+        UI.Text(g, "x65 y39 w138 h14", "DOCTOR BINDER  ·  " App.Version, S, 7, Theme.Muted, 600)
 
-        ; индикатор активности (клик — вкл / выкл)
-        stb := UI.Box(g, 10, 62, this.SW - 20, 24, S, 7, "+0x100")
-        this.StDot := UI.Text(g, "x18 y62 w12 h24 +0x200", "●", S, 8, Theme.Success)
-        this.StText := UI.Text(g, "x32 y62 w110 h24 +0x200", "", S, 9, Theme.Success, 600)
-        this.StVer := UI.Text(g, "x" (this.SW - 76) " y62 w58 h24 +0x200 Right", "v" App.Version, S, 8, Theme.Faint, 600)
-        for c in [stb, this.StDot, this.StText, this.StVer]
+        ; Нажатие на статус включает или выключает биндер.
+        stb := UI.Box(g, 12, 62, this.SW - 24, 32, S, 8, "+0x100")
+        this.StDot := UI.Text(g, "x20 y62 w14 h32 +0x100 +0x200 Center", "●", S, 8, Theme.Success)
+        this.StText := UI.Text(g, "x38 y62 w" (this.SW - 102) " h32 +0x100 +0x200", "", S, 8, Theme.Success, 600)
+        this.StVer := UI.Text(g, "x" (this.SW - 59) " y62 w39 h32 +0x100 +0x200 Right", "v" App.Version, S, 8, Theme.Faint, 600)
+        statusHover := PaintHover([stb, this.StDot, this.StText, this.StVer], S, Theme.CardHover)
+        for c in [stb, this.StDot, this.StText, this.StVer] {
             c.OnEvent("Click", (*) => Keys.ToggleEnabled())
-        Hover.Add(stb, PaintHover([stb], S, Theme.Card), g.Hwnd)
+            Hover.Add(c, statusHover, g.Hwnd)
+        }
+        UI.Divider(g, 16, 106, this.SW - 32)
+        UI.Text(g, "x18 y114 w180 h14", "КАТЕГОРИИ", S, 7, Theme.Faint, 700)
 
-        ; категории
         loop this.NavN {
             y := this.NavTop + (A_Index - 1) * this.NavStep
-            base := UI.Box(g, 10, y, this.SW - 20, 30, S, 8, "+0x100")
-            bar := UI.Box(g, 10, y + 7, 3, 16, Theme.Accent, 2)
-            ic := UI.IconText(g, "x22 y" y " w20 h30", "", S, 10, Theme.Muted)
-            name := UI.Text(g, "x48 y" y " w" (this.SW - 92) " h30 +0x200", "", S, 10, Theme.Soft, 500)
-            cnt := UI.Text(g, "x" (this.SW - 42) " y" y " w24 h30 +0x200 Right", "", S, 8, Theme.Faint, 600)
+            base := UI.Box(g, 12, y, this.SW - 24, 30, S, 8, "+0x100")
+            bar := UI.Box(g, 12, y + 7, 2, 16, Theme.Accent, 1, "+0x100")
+            ic := UI.IconText(g, "x22 y" y " w20 h30 +0x100", "", S, 10, Theme.Muted)
+            name := UI.Text(g, "x48 y" y " w" (this.SW - 94) " h30 +0x100 +0x200", "", S, 9, Theme.Soft, 500)
+            cnt := UI.Text(g, "x" (this.SW - 42) " y" y " w24 h30 +0x100 +0x200 Right", "", S, 8, Theme.Faint, 600)
             this.Navs.Push({plate: base, bar: bar, ic: ic, name: name, cnt: cnt, item: 0})
-            base.OnEvent("Click", this.NavClicker(A_Index))
-            this.Hwnds[base.Hwnd] := {t: "nav", i: A_Index}
-            Hover.Add(base, SlotHover("nav", A_Index), g.Hwnd)
+            navIdx := A_Index
+            navHover := SlotHover("nav", navIdx)
+            for ctrl in [base, bar, ic, name, cnt] {
+                ctrl.OnEvent("Click", this.NavClicker(navIdx))
+                this.Hwnds[ctrl.Hwnd] := {t: "nav", i: navIdx}
+                Hover.Add(ctrl, navHover, g.Hwnd)
+            }
         }
-        ya := this.NavTop + this.NavN * this.NavStep + 8
-        ab := UI.Box(g, 10, ya, this.SW - 20, 30, S, 8, "+0x100")
-        ai := UI.IconText(g, "x22 y" ya " w20 h30", Icon.Add, S, 9, Theme.Muted)
-        at := UI.Text(g, "x48 y" ya " w" (this.SW - 70) " h30 +0x200", "Добавить категорию", S, 9, Theme.Muted, 500)
-        for c in [ab, ai, at]
+        ya := this.NavTop + this.NavN * this.NavStep + 6
+        ab := UI.Box(g, 12, ya, this.SW - 24, 30, S, 8, "+0x100")
+        ai := UI.IconText(g, "x22 y" ya " w20 h30 +0x100", Icon.Add, S, 9, Theme.Muted)
+        at := UI.Text(g, "x48 y" ya " w" (this.SW - 70) " h30 +0x100 +0x200", "Добавить категорию", S, 9, Theme.Muted, 500)
+        addCategoryHover := PaintHover([ab, ai, at], S, Theme.CardHover)
+        for c in [ab, ai, at] {
             c.OnEvent("Click", (*) => MainUI.NewCategory())
-        Hover.Add(ab, PaintHover([ab, ai, at], S, Theme.Card), g.Hwnd)
+            Hover.Add(c, addCategoryHover, g.Hwnd)
+        }
 
-        ; профиль и настройки внизу
-        UI.Divider(g, 16, H - 150, this.SW - 32)
-        pr := UI.Box(g, 10, H - 140, this.SW - 20, 30, S, 8, "+0x100")
-        pi := UI.IconText(g, "x22 y" (H - 140) " w20 h30", Icon.Cat["person"], S, 10, Theme.Muted)
-        pt := UI.Text(g, "x48 y" (H - 140) " w" (this.SW - 70) " h30 +0x200", "Профиль", S, 10, Theme.Soft, 500)
-        for c in [pr, pi, pt]
+        ; Профиль и настройки — внизу, без лишних вложенных плашек.
+        UI.Divider(g, 16, H - 122, this.SW - 32)
+        pf := UI.Box(g, 12, H - 114, this.SW - 24, 50, S, 8, "+0x100")
+        this.Avatar := UI.Text(g, "x20 y" (H - 105) " w34 h34 +0x100 +0x200 Center", "?", Theme.AccentSoft, 9, Theme.Accent, 700)
+        Theme.Round(this.Avatar, 34, 34, 17)
+        this.ProfName := UI.Text(g, "x64 y" (H - 108) " w" (this.SW - 94) " h16", "", S, 9, Theme.Text, 600)
+        this.ProfInfo := UI.Text(g, "x64 y" (H - 91) " w" (this.SW - 94) " h13", "", S, 8, Theme.Muted)
+        this.ProfId := UI.Text(g, "x64 y" (H - 77) " w" (this.SW - 94) " h12", "", S, 7, Theme.Faint)
+        pch := UI.IconText(g, "x" (this.SW - 34) " y" (H - 105) " w18 h34 +0x100 +0x200", Icon.ChevR, S, 8, Theme.Faint)
+        profileHover := PaintHover([pf, this.ProfName, this.ProfInfo, this.ProfId, pch], S, Theme.CardHover)
+        for c in [pf, this.Avatar, this.ProfName, this.ProfInfo, this.ProfId, pch] {
             c.OnEvent("Click", (*) => SettingsUI.Open())
-        Hover.Add(pr, PaintHover([pr, pi, pt], S, Theme.Card), g.Hwnd)
+            Hover.Add(c, profileHover, g.Hwnd)
+        }
 
-        pf := UI.Box(g, 10, H - 102, this.SW - 20, 54, Theme.Card, 10, "+0x100")
-        this.Avatar := UI.Text(g, "x18 y" (H - 93) " w36 h36 +0x200 Center", "?", Theme.VioletSoft, 10, Theme.Violet, 700)
-        Theme.Round(this.Avatar, 36, 36, 18)
-        this.ProfName := UI.Text(g, "x62 y" (H - 96) " w" (this.SW - 100) " h18", "", Theme.Card, 10, Theme.Text, 600)
-        this.ProfInfo := UI.Text(g, "x62 y" (H - 79) " w" (this.SW - 100) " h14", "", Theme.Card, 8, Theme.Muted)
-        this.ProfId := UI.Text(g, "x62 y" (H - 65) " w" (this.SW - 100) " h14", "", Theme.Card, 8, Theme.Faint)
-        pch := UI.IconText(g, "x" (this.SW - 34) " y" (H - 89) " w20 h28 +0x200", Icon.ChevR, Theme.Card, 8, Theme.Faint)
-        for c in [pf, this.Avatar, this.ProfName, this.ProfInfo, this.ProfId, pch]
+        sr := UI.Box(g, 12, H - 54, this.SW - 24, 34, S, 8, "+0x100")
+        si := UI.IconText(g, "x22 y" (H - 54) " w20 h34 +0x100", Icon.Settings, S, 10, Theme.Muted)
+        stt := UI.Text(g, "x48 y" (H - 54) " w" (this.SW - 70) " h34 +0x100 +0x200", "Настройки", S, 9, Theme.Soft, 500)
+        settingsHover := PaintHover([sr, si, stt], S, Theme.CardHover)
+        for c in [sr, si, stt] {
             c.OnEvent("Click", (*) => SettingsUI.Open())
-        Hover.Add(pf, PaintHover([pf, this.Avatar, this.ProfName, this.ProfInfo, this.ProfId, pch], Theme.Card, Theme.CardHover), g.Hwnd)
+            Hover.Add(c, settingsHover, g.Hwnd)
+        }
 
-        sr := UI.Box(g, 10, H - 42, this.SW - 20, 30, S, 8, "+0x100")
-        si := UI.IconText(g, "x22 y" (H - 42) " w20 h30", Icon.Settings, S, 10, Theme.Muted)
-        stt := UI.Text(g, "x48 y" (H - 42) " w" (this.SW - 70) " h30 +0x200", "Настройки", S, 10, Theme.Soft, 500)
-        for c in [sr, si, stt]
-            c.OnEvent("Click", (*) => SettingsUI.Open())
-        Hover.Add(sr, PaintHover([sr, si, stt], S, Theme.Card), g.Hwnd)
-
-        ; ================= шапка =================
+        ; ================= заголовок =================
         CX := this.CX, CW := this.CW
-        this.TitleI := UI.IconText(g, "x" CX " y16 w40 h40", "", Theme.AccentSoft, 13, Theme.Accent)
-        Theme.Round(this.TitleI, 40, 40, 12)
-        UI.Text(g, "x" (CX + 54) " y13 w200 h14", "Категория", B, 8, Theme.Muted)
-        this.TitleT := UI.Text(g, "x" (CX + 54) " y27 w300 h24", "", B, 15, Theme.Text, 700)
-        this.CountT := UI.Text(g, "x" (CX + 54) " y31 w" (CW - 60) " h20 +0x200", "", B, 9, Theme.Muted)
+        this.TitleI := UI.IconText(g, "x" CX " y18 w36 h36", "", Theme.AccentSoft, 13, Theme.Accent)
+        Theme.Round(this.TitleI, 36, 36, 11)
+        this.TitleT := UI.Text(g, "x" (CX + 48) " y17 w" (Min(CW - 80, 380)) " h22", "", B, 14, Theme.Text, 700)
+        this.CountT := UI.Text(g, "x" (CX + 48) " y41 w" (CW - 56) " h16", "", B, 8, Theme.Muted)
 
-        ; статус игры справа
-        gcw := 176
+        ; Статус игры показывается текстом, без отдельной тёмной карточки.
+        gcw := 170
         gcx := W - 16 - gcw
-        gcf := UI.Frame(g, gcx, 14, gcw, 44, Theme.Card, 10, , "+0x100")
-        UI.IconText(g, "x" (gcx + 12) " y15 w20 h42", Icon.Monitor, Theme.Card, 11, Theme.Muted)
-        this.GameName := UI.Text(g, "x" (gcx + 40) " y13 w" (gcw - 70) " h22 +0x200", "", Theme.Card, 9, Theme.Text, 600)
-        this.GameSt := UI.Text(g, "x" (gcx + 40) " y33 w" (gcw - 70) " h16 +0x200", "", Theme.Card, 8, Theme.Success, 600)
-        UI.IconText(g, "x" (gcx + gcw - 26) " y15 w16 h42", Icon.Down, Theme.Card, 8, Theme.Muted)
-        for c in [gcf.i, this.GameName, this.GameSt]
+        this.GameHit := UI.Box(g, gcx, 16, gcw, 44, B, 0, "+0x100")
+        this.GameDot := UI.Text(g, "x" gcx " y17 w18 h40 +0x100 +0x200 Center", "●", B, 8, Theme.Faint)
+        this.GameName := UI.Text(g, "x" (gcx + 22) " y18 w" (gcw - 26) " h18 +0x100", "", B, 9, Theme.Text, 600)
+        this.GameSt := UI.Text(g, "x" (gcx + 22) " y36 w" (gcw - 26) " h16 +0x100", "", B, 8, Theme.Muted)
+        for c in [this.GameHit, this.GameDot, this.GameName, this.GameSt]
             c.OnEvent("Click", (*) => SettingsUI.Open())
-        Hover.Add(gcf.i, PaintHover([gcf.i, this.GameName, this.GameSt], Theme.Card, Theme.CardHover), g.Hwnd)
-        this.EcgX := gcx - 256
-        UI.Text(g, "x" this.EcgX " y16 w240 h40 Right", "─────────/\──────/\────────/\─────────", B, 9, Theme.AccentLine, 400, Theme.Mono)
 
-        ; ================= панель действий =================
-        ty := 68
-        createX := W - 16 - 150
-        Btn.Add(g, "x" createX " y" ty " w150 h38", "Создать бинд", (*) => Editor.Open("", MainUI.CurCat), "primary", 10, Icon.Add)
-        this.EnableSw := SwitchCtl(g, createX - 58, ty + 6, 92, "", Keys.Enabled, B, Theme.Success)
-        this.EnableSw.Lbl.Visible := false
+        ; ================= поиск и действия =================
+        ty := 72
+        createX := W - 16 - 144
+        Btn.Add(g, "x" createX " y" ty " w144 h38", "Создать бинд", (*) => Editor.Open("", MainUI.CurCat), "primary", 9, Icon.Add)
+        this.EnableSw := SwitchCtl(g, createX - 104, ty + 5, 92, "Биндер", Keys.Enabled, B, Theme.Success)
+        this.EnableSw.Lbl.SetFont("s8 w500 c" Theme.Soft, Theme.Font)
         this.EnableSw.OnChange := (*) => Keys.ToggleEnabled()
-        impX := createX - 58 - 16 - 110
-        Btn.Add(g, "x" impX " y" ty " w110 h38", "Импорт", (*) => Share.ImportDialog(), "ghost", 10, Icon.Import)
-        swd := impX - 16 - CX
+        impX := createX - 104 - 12 - 98
+        Btn.Add(g, "x" impX " y" ty " w98 h38", "Импорт", (*) => Share.ImportDialog(), "ghost", 9, Icon.Import)
+        swd := impX - 12 - CX
         sf := UI.Frame(g, CX, ty, swd, 38, Theme.Field, 10)
-        UI.IconText(g, "x" (CX + 12) " y" (ty - 1) " w20 h40", Icon.Search, Theme.Field, 11, Theme.Muted)
-        g.SetFont("s10 w400 q5 c" Theme.Text, Theme.Font)
-        this.SearchE := g.AddEdit("x" (CX + 40) " y" (ty + 8) " w" (swd - 140) " r1 -E0x200 -Multi Background" Theme.Field)
+        UI.IconText(g, "x" (CX + 12) " y" (ty - 1) " w20 h40", Icon.Search, Theme.Field, 10, Theme.Muted)
+        g.SetFont("s9 w400 q5 c" Theme.Text, Theme.Font)
+        this.SearchE := g.AddEdit("x" (CX + 40) " y" (ty + 8) " w" (swd - 136) " r1 -E0x200 -Multi Background" Theme.Field)
         Theme.DarkCtrl(this.SearchE)
         UI.Cue(this.SearchE, "Поиск по названию, содержимому или горячей клавише...")
         UI.FocusRing(this.SearchE, sf.o)
-        this.SearchX := UI.IconText(g, "x" (CX + swd - 94) " y" (ty - 1) " w24 h40 +0x100", Icon.Cancel, Theme.Field, 8, Theme.Muted)
+        hint := UI.Text(g, "x" (CX + swd - 84) " y" (ty + 10) " w38 h18 +0x200 Center", "Ctrl+K", Theme.Field, 7, Theme.Faint, 600)
+        this.SearchX := UI.IconText(g, "x" (CX + swd - 38) " y" (ty + 1) " w28 h36 +0x100", Icon.Cancel, Theme.Field, 8, Theme.Muted)
         this.SearchX.OnEvent("Click", (*) => MainUI.ClearSearch())
         this.SearchX.Visible := false
-        hint := UI.Text(g, "x" (CX + swd - 66) " y" (ty + 9) " w54 h20 +0x200 Center", "Ctrl + K", Theme.FieldHover, 8, Theme.Muted, 600)
-        Theme.Round(hint, 54, 20, 6)
         this.SearchE.OnEvent("Change", (*) => (MainUI.Offset := 0, MainUI.Refresh()))
 
         ; ================= карточки =================
+        cardTextX := CX + 60
+        cardMenuX := CX + CW - 36
+        cardSwitchX := cardMenuX - 92
+        cardCountX := cardSwitchX - 82
+        cardCatX := cardCountX - 78
+        cardKeyX := cardCatX - 90
+        cardTextW := Max(150, cardKeyX - 10 - cardTextX)
+        cardCatW := 68
         loop this.CardN {
-            y := this.LT + (A_Index - 1) * this.STEP
-            fr := UI.Frame(g, CX, y, CW, this.CH, C, 12, , "+0x100")
-            plate := UI.IconText(g, "x" (CX + 12) " y" (y + 12) " w38 h38", "", Theme.Field, 12, Theme.Soft)
-            Theme.Round(plate, 38, 38, 10)
-            title := UI.Text(g, "x" (CX + 62) " y" (y + 8) " w" (CW - 322) " h18", "", C, 10, Theme.Text, 600)
-            keyf := UI.Frame(g, CX + 62, y + 8, 40, 18, Theme.Field, 6, Theme.KeyLine)
-            key := UI.Text(g, "x" (CX + 62) " y" (y + 8) " w40 h18 +0x200 Center", "", Theme.Field, 8, Theme.Text, 700, Theme.Mono)
-            catb := UI.Box(g, CX + 62, y + 8, 60, 18, Theme.AccentSoft, 6)
-            cat := UI.Text(g, "x" (CX + 62) " y" (y + 8) " w60 h18 +0x200 Center", "", Theme.AccentSoft, 8, Theme.Accent, 600)
-            sub1 := UI.Text(g, "x" (CX + 62) " y" (y + 28) " w" (CW - 302) " h15", "", C, 9, Theme.Soft)
-            sub2 := UI.Text(g, "x" (CX + 62) " y" (y + 43) " w" (CW - 302) " h15", "", C, 9, Theme.Muted)
-            cnt := UI.Text(g, "x" (CX + CW - 212) " y" (y + 22) " w84 h18 +0x200 Right", "", C, 9, Theme.Muted)
-            swx := CX + CW - 118
-            sw := SwitchCtl(g, swx, y + 17, 80, "Вкл", true, C, Theme.Success)
-            sw.OnChange := this.Switcher(A_Index)
-            keb := UI.IconText(g, "x" (CX + CW - 30) " y" (y + 20) " w24 h24 +0x100", Icon.More, C, 9, Theme.Muted)
-            chk := UI.IconText(g, "x" (CX + CW - 26) " y" (y + 4) " w16 h16 +0x200 Center", Icon.Check, Theme.Accent, 7, Theme.AccentInk)
-            Theme.Round(chk, 16, 16, 8)
-            this.Cards.Push({fr: fr, plate: plate, title: title, keyf: keyf, key: key, catb: catb, cat: cat, sub1: sub1, sub2: sub2, cnt: cnt, sw: sw, keb: keb, chk: chk, id: ""})
-            fr.i.OnEvent("Click", this.CardClicker(A_Index))
-            fr.i.OnEvent("DoubleClick", this.CardOpener(A_Index))
-            keb.OnEvent("Click", this.KebClicker(A_Index))
-            this.Hwnds[fr.i.Hwnd] := {t: "card", i: A_Index}
-            Hover.Add(fr.i, SlotHover("card", A_Index), g.Hwnd)
+            slotIdx := A_Index
+            y := this.LT + (slotIdx - 1) * this.STEP
+            fr := UI.Frame(g, CX, y, CW, this.CH, C, 11, Theme.Line, "+0x100")
+            selBar := UI.Box(g, CX + 1, y + 10, 2, this.CH - 20, Theme.Accent, 1, "+0x100")
+            selBar.Visible := false
+            plate := UI.IconText(g, "x" (CX + 14) " y" (y + 16) " w34 h36 +0x100", "", C, 14, Theme.Accent)
+            title := UI.Text(g, "x" cardTextX " y" (y + 8) " w" cardTextW " h18 +0x100", "", C, 10, Theme.Text, 650)
+            sub1 := UI.Text(g, "x" cardTextX " y" (y + 29) " w" cardTextW " h15 +0x100", "", C, 8, Theme.Soft)
+            sub2 := UI.Text(g, "x" cardTextX " y" (y + 44) " w" cardTextW " h15 +0x100", "", C, 8, Theme.Muted)
+            keyf := UI.Frame(g, cardKeyX, y + 23, 52, 22, Theme.Field, 7, Theme.KeyLine)
+            key := UI.Text(g, "x" cardKeyX " y" (y + 23) " w52 h22 +0x100 +0x200 Center", "", Theme.Field, 8, Theme.Text, 700, Theme.Mono)
+            cat := UI.Text(g, "x" cardCatX " y" (y + 23) " w" cardCatW " h22 +0x100", "", C, 8, Theme.Accent, 600)
+            cnt := UI.Text(g, "x" cardCountX " y" (y + 23) " w72 h22 +0x100 +0x200 Right", "", C, 8, Theme.Muted, 500)
+            sw := SwitchCtl(g, cardSwitchX, y + 20, 84, "Вкл", true, C, Theme.Success)
+            sw.Lbl.SetFont("s8 w500 c" Theme.Soft, Theme.Font)
+            sw.OnChange := this.Switcher(slotIdx)
+            keb := UI.IconText(g, "x" cardMenuX " y" (y + 22) " w24 h24 +0x100", Icon.More, C, 10, Theme.Muted)
+            this.Cards.Push({fr: fr, selBar: selBar, plate: plate, title: title, keyf: keyf, key: key, cat: cat, sub1: sub1, sub2: sub2, cnt: cnt, sw: sw, keb: keb, textW: cardTextW, keyX: cardKeyX, catX: cardCatX, catW: cardCatW, id: ""})
+
+            cardHover := SlotHover("card", slotIdx)
+            for ctrl in [fr.o, fr.i, plate, title, sub1, sub2, keyf.o, keyf.i, key, cat, cnt, selBar] {
+                ctrl.OnEvent("Click", this.CardClicker(slotIdx))
+                ctrl.OnEvent("DoubleClick", this.CardOpener(slotIdx))
+                this.Hwnds[ctrl.Hwnd] := {t: "card", i: slotIdx}
+                Hover.Add(ctrl, cardHover, g.Hwnd)
+            }
+            keb.OnEvent("Click", this.KebClicker(slotIdx))
+            this.Hwnds[keb.Hwnd] := {t: "card", i: slotIdx}
+            Hover.Add(keb, cardHover, g.Hwnd)
         }
 
-        ; пустое состояние (горизонтальная плашка)
+        ; пустое состояние списка
         e := this.E
-        e.fr := UI.Frame(g, CX, this.LT, CW, 76, C, 12)
-        e.ic := UI.IconText(g, "x" (CX + 16) " y" (this.LT + 16) " w44 h44", Icon.Search, Theme.Field, 14, Theme.Muted)
+        e.fr := UI.Frame(g, CX, this.LT, CW, 88, C, 12)
+        e.ic := UI.IconText(g, "x" (CX + 16) " y" (this.LT + 22) " w44 h44", Icon.Search, Theme.AccentSoft, 14, Theme.Accent)
         Theme.Round(e.ic, 44, 44, 22)
-        e.t := UI.Text(g, "x" (CX + 76) " y" (this.LT + 16) " w" (CW - 240) " h20", "", C, 11, Theme.Text, 700)
-        e.s := UI.Text(g, "x" (CX + 76) " y" (this.LT + 38) " w" (CW - 240) " h30", "", C, 9, Theme.Muted)
-        e.b := Btn.Add(g, "x" (CX + CW - 150) " y" (this.LT + 19) " w134 h38", "Создать бинд", (*) => Editor.Open("", MainUI.CurCat), "ghost", 9, Icon.Add, C)
+        e.t := UI.Text(g, "x" (CX + 76) " y" (this.LT + 20) " w" (CW - 250) " h22", "", C, 11, Theme.Text, 700)
+        e.s := UI.Text(g, "x" (CX + 76) " y" (this.LT + 44) " w" (CW - 250) " h30", "", C, 8, Theme.Muted)
+        e.b := Btn.Add(g, "x" (CX + CW - 150) " y" (this.LT + 25) " w134 h38", "Создать бинд", (*) => Editor.Open("", MainUI.CurCat), "ghost", 9, Icon.Add, C)
 
         ; ================= пагинация =================
         py := H - 46
         Mk(x, glyph) {
             s := UI.Box(g, x, py, 28, 28, Theme.Field, 8, "+0x100")
-            t := UI.IconText(g, "x" x " y" py " w28 h28 +0x200", glyph, Theme.Field, 8, Theme.Muted)
+            t := UI.IconText(g, "x" x " y" py " w28 h28 +0x100 +0x200", glyph, Theme.Field, 8, Theme.Muted)
             return {s: s, t: t, page: 0}
         }
         this.PgPrev := Mk(CX, Icon.ChevL)
-        this.PgPrev.s.OnEvent("Click", (*) => MainUI.PageBy(-1))
+        for c in [this.PgPrev.s, this.PgPrev.t]
+            c.OnEvent("Click", (*) => MainUI.PageBy(-1))
         loop 7 {
             s := UI.Box(g, CX, py, 28, 28, Theme.Field, 8, "+0x100")
-            t := UI.Text(g, "x" CX " y" py " w28 h28 +0x200 Center", "", Theme.Field, 9, Theme.Muted, 600)
+            t := UI.Text(g, "x" CX " y" py " w28 h28 +0x100 +0x200 Center", "", Theme.Field, 9, Theme.Muted, 600)
             slot := {s: s, t: t, page: 0}
-            s.OnEvent("Click", this.Pager(A_Index))
+            slotIdx := A_Index
+            for c in [s, t]
+                c.OnEvent("Click", this.Pager(slotIdx))
             this.PgSlots.Push(slot)
         }
         this.PgNext := Mk(CX, Icon.ChevR)
-        this.PgNext.s.OnEvent("Click", (*) => MainUI.PageBy(1))
+        for c in [this.PgNext.s, this.PgNext.t]
+            c.OnEvent("Click", (*) => MainUI.PageBy(1))
         this.PgInfo := UI.Text(g, "x" CX " y" py " w" CW " h28 +0x200 Right", "", B, 8, Theme.Faint)
 
         ; ================= правая панель =================
         PX := this.PX, PW := this.PW
-        px := PX + 18, pw := PW - 36
+        px := PX + 16, pw := PW - 32
         UI.Frame(g, PX, 120, PW, H - 136, C, 14)
         d := this.D
         d.px := px, d.pw := pw
-        d.foot := H >= 640
-        footH := d.foot ? 34 : 0
-        bb := H - 30 - footH
-        d.yDel := bb - 30, d.yShare := d.yDel - 36, d.yDup := d.yShare - 36, d.yMain := d.yDup - 40
-        d.yS2 := d.yMain - 12 - 26, d.yS1 := d.yS2 - 32
+        d.yMain := H - 68
+        d.ySecondary := H - 112
+        d.yMeta := H - 153
+        d.pvY := 314
+        pvH := Max(72, d.yMeta - 14 - d.pvY)
 
-        d.ic := UI.IconText(g, "x" px " y138 w38 h38", "", Theme.AccentSoft, 12, Theme.Accent)
-        Theme.Round(d.ic, 38, 38, 10)
-        d.name := UI.Text(g, "x" (px + 50) " y140 w" (pw - 110) " h22", "", C, 12, Theme.Text, 700)
-        d.keyf := UI.Frame(g, px + 50, 141, 40, 20, Theme.Field, 6, Theme.KeyLine)
-        d.key := UI.Text(g, "x" (px + 50) " y141 w40 h20 +0x200 Center", "", Theme.Field, 8, Theme.Text, 700, Theme.Mono)
-        d.keb := UI.IconText(g, "x" (px + pw - 24) " y138 w24 h24 +0x100", Icon.More, C, 9, Theme.Muted)
+        ; Заголовок и компактная строка статуса.
+        d.ic := UI.IconText(g, "x" px " y138 w36 h36", "", C, 15, Theme.Accent)
+        d.name := UI.Text(g, "x" (px + 46) " y141 w" (pw - 78) " h24", "", C, 12, Theme.Text, 700)
+        d.keb := UI.IconText(g, "x" (px + pw - 24) " y138 w24 h24 +0x100", Icon.More, C, 10, Theme.Muted)
         d.keb.OnEvent("Click", (*) => MainUI.DetailMenu())
-        d.st := UI.Text(g, "x" px " y186 w80 h20 +0x200 Center", "", Theme.SuccessBg, 8, Theme.Success, 700)
-        Theme.Round(d.st, 80, 20, 10)
-        d.catb := UI.Box(g, px, 186, 70, 20, Theme.AccentSoft, 10)
-        d.cat := UI.Text(g, "x" px " y186 w70 h20 +0x200 Center", "", Theme.AccentSoft, 8, Theme.Accent, 600)
-        d.hint := UI.Text(g, "x" px " y186 w" pw " h44", "", C, 9, Theme.Muted)
-        d.compact := H < 640
-        if !d.compact {
-            d.dlbl := UI.Text(g, "x" px " y218 w" pw " h16", "Описание", C, 9, Theme.Muted, 600)
-            d.dfr := UI.Frame(g, px, 234, pw, 54, Theme.Bg, 8)
-            d.desc := UI.Text(g, "x" (px + 12) " y240 w" (pw - 24) " h42", "", Theme.Bg, 9, Theme.Soft)
-            d.plblY := 300, d.pvY := 316
-        } else {
-            d.dlbl := UI.Text(g, "x" px " y218 w" pw " h16", "Описание", C, 9, Theme.Muted, 600)
-            d.dfr := UI.Frame(g, px, 234, pw, 54, Theme.Bg, 8)
-            d.desc := UI.Text(g, "x" (px + 12) " y240 w" (pw - 24) " h42", "", Theme.Bg, 9, Theme.Soft)
-            d.plblY := 218, d.pvY := 234
-        }
-        pvH := d.yS1 - 10 - d.pvY
-        d.plbl := UI.Text(g, "x" px " y" d.plblY " w" pw " h16", "Предпросмотр", C, 9, Theme.Muted, 600)
+        d.keyf := UI.Frame(g, px, 183, 52, 22, Theme.Field, 7, Theme.KeyLine)
+        d.key := UI.Text(g, "x" px " y183 w52 h22 +0x200 Center", "", Theme.Field, 8, Theme.Text, 700, Theme.Mono)
+        d.st := UI.Text(g, "x" (px + 64) " y183 w82 h22", "", C, 8, Theme.Success, 600)
+        d.cat := UI.Text(g, "x" (px + 152) " y183 w" (pw - 152) " h22", "", C, 8, Theme.Accent, 600)
+
+        d.dlbl := UI.Text(g, "x" px " y218 w" pw " h14", "ОПИСАНИЕ", C, 7, Theme.Muted, 700)
+        d.desc := UI.Text(g, "x" px " y236 w" pw " h46", "", C, 9, Theme.Soft)
+        d.plbl := UI.Text(g, "x" px " y294 w" pw " h16", "ПРЕДПРОСМОТР", C, 7, Theme.Muted, 700)
         d.pbox := UI.Box(g, px, d.pvY, pw, pvH, Theme.ChatBg, 10)
-        d.rv := RichView(g, px + 10, d.pvY + 8, pw - 20, pvH - 16, Theme.ChatBg)
+        d.rv := RichView(g, px + 8, d.pvY + 8, pw - 16, pvH - 16, Theme.ChatBg)
+        d.meta := UI.Text(g, "x" px " y" d.yMeta " w" pw " h18", "", C, 8, Theme.Muted)
 
-        ; статистика 2×2
-        Cell(x, y, glyph) {
-            ic := UI.IconText(g, "x" x " y" y " w26 h26", glyph, Theme.Field, 9, Theme.Muted)
-            Theme.Round(ic, 26, 26, 7)
-            l := UI.Text(g, "x" (x + 34) " y" (y - 2) " w" (pw // 2 - 40) " h14", "", C, 8, Theme.Muted)
-            v := UI.Text(g, "x" (x + 34) " y" (y + 12) " w" (pw // 2 - 40) " h16", "", C, 9, Theme.Text, 600)
-            return {ic: ic, l: l, v: v}
-        }
-        d.s1 := Cell(px, d.yS1, Icon.Doc)
-        d.s2 := Cell(px + pw // 2, d.yS1, Icon.Keyboard)
-        d.s3 := Cell(px, d.yS2, Icon.Folder)
-        d.s4 := Cell(px + pw // 2, d.yS2, Icon.Clock)
+        d.main := Btn.Add(g, "x" px " y" d.yMain " w" pw " h36", "Редактировать", (*) => MainUI.EditSelected(), "primary", 9, Icon.Edit, C)
+        actionGap := 8
+        actionW := (pw - actionGap * 2) // 3
+        d.b1 := Btn.Add(g, "x" px " y" d.ySecondary " w" actionW " h30", "Дублировать", (*) => MainUI.DuplicateSelected(), "ghost", 8, Icon.Copy, C)
+        d.b2 := Btn.Add(g, "x" (px + actionW + actionGap) " y" d.ySecondary " w" actionW " h30", "Поделиться", (*) => MainUI.ShareSelected(), "ghost", 8, Icon.Share, C)
+        d.b3 := Btn.Add(g, "x" (px + (actionW + actionGap) * 2) " y" d.ySecondary " w" actionW " h30", "Удалить", (*) => MainUI.DeleteSelected(), "danger", 8, Icon.Delete, C)
 
-        d.main := Btn.Add(g, "x" px " y" d.yMain " w" pw " h36", "Редактировать", (*) => MainUI.EditSelected(), "primary", 10, Icon.Edit, C)
-        d.b1 := Btn.Add(g, "x" px " y" d.yDup " w" pw " h30", "Дублировать", (*) => MainUI.DuplicateSelected(), "ghost", 9, Icon.Copy, C)
-        d.b2 := Btn.Add(g, "x" px " y" d.yShare " w" pw " h30", "Поделиться", (*) => MainUI.ShareSelected(), "ghost", 9, Icon.Share, C)
-        d.b3 := Btn.Add(g, "x" px " y" d.yDel " w" pw " h30", "Удалить", (*) => MainUI.DeleteSelected(), "danger", 9, Icon.Delete, C)
-
-        d.f1l := UI.Text(g, "x" px " y" (bb + 6) " w" (pw // 2) " h14", "Последние изменения", C, 8, Theme.Faint)
-        d.f1v := UI.Text(g, "x" px " y" (bb + 19) " w" (pw // 2) " h14", "", C, 9, Theme.Soft, 600)
-        d.f2l := UI.Text(g, "x" (px + pw // 2) " y" (bb + 6) " w" (pw // 2) " h14", "Автор", C, 8, Theme.Faint)
-        d.f2v := UI.Text(g, "x" (px + pw // 2) " y" (bb + 19) " w" (pw // 2) " h14", "Вы", C, 9, Theme.Soft, 600)
+        ; Чистое пустое состояние без горячих клавиш, занимающих весь предпросмотр.
+        d.emptyIcon := UI.IconText(g, "x" (px + (pw - 48) // 2) " y260 w48 h48", Icon.Search, Theme.AccentSoft, 16, Theme.Accent)
+        Theme.Round(d.emptyIcon, 48, 48, 16)
+        d.emptyTitle := UI.Text(g, "x" (px + 8) " y320 w" (pw - 16) " h22 +0x200 Center", "Выберите бинд", C, 11, Theme.Text, 700)
+        d.emptyHint := UI.Text(g, "x" (px + 12) " y348 w" (pw - 24) " h44 +0x200 Center", "Выберите карточку в списке, чтобы увидеть описание и предпросмотр.", C, 8, Theme.Muted)
+        d.emptyKeys := UI.Text(g, "x" (px + 8) " y400 w" (pw - 16) " h28 +0x200 Center", "Двойной клик — редактировать  ·  ПКМ — действия", C, 7, Theme.Faint)
+        d.hint := UI.Text(g, "x" px " y218 w" pw " h46", "", C, 8, Theme.Muted)
 
         g.OnEvent("Close", (*) => MainUI.G.Hide())
         g.OnEvent("Escape", (*) => MainUI.OnEsc())
@@ -2441,8 +2441,8 @@ class MainUI {
         if !this.G
             return
         on := Keys.Enabled
-        this.StDot.SetFont("c" (on ? Theme.Success : Theme.Danger))
-        this.StText.SetFont("c" (on ? Theme.Success : Theme.Danger))
+        this.StDot.SetFont("c" (on ? Theme.Success : Theme.Faint))
+        this.StText.SetFont("c" (on ? Theme.Success : Theme.Faint))
         this.StText.Value := on ? "Биндер активен" : "На паузе"
         this.EnableSw.Set(on)
         for c in [this.StDot, this.StText]
@@ -2455,12 +2455,13 @@ class MainUI {
             return
         s := Store.Data["settings"]
         exe := String(s["gameExe"])
-        this.GameName.Value := InStr(exe, "gta_sa") ? "GTA SAMP RP" : exe
+        this.GameName.Value := InStr(exe, "gta_sa") ? "GTA SAMP RP" : this.FitText(exe, 140, 9, 600)
         gameRunning := false
         try gameRunning := WinExist("ahk_exe " exe) != 0
-        this.GameSt.SetFont("c" (gameRunning ? Theme.Success : Theme.Faint))
-        this.GameSt.Value := gameRunning ? "● Подключен" : "○ Не в игре"
-        for c in [this.GameName, this.GameSt]
+        this.GameDot.SetFont("c" (gameRunning ? Theme.Success : Theme.Faint))
+        this.GameSt.SetFont("c" (gameRunning ? Theme.Success : Theme.Muted))
+        this.GameSt.Value := gameRunning ? "Игра запущена" : "Не в игре · настройки"
+        for c in [this.GameDot, this.GameName, this.GameSt]
             c.Redraw()
     }
 
@@ -2469,9 +2470,9 @@ class MainUI {
             return
         p := Store.Data["profile"]
         nick := String(p["nick"])
-        this.ProfName.Value := nick != "" ? StrReplace(nick, "_", " ") : "Укажите ник"
-        this.ProfInfo.Value := p["rank"] != "" ? p["rank"] : "профиль не заполнен"
-        this.ProfId.Value := p["id"] != "" ? "ID: " p["id"] : "ID не указан"
+        this.ProfName.Value := this.FitText(nick != "" ? StrReplace(nick, "_", " ") : "Укажите ник", this.SW - 94, 9, 600)
+        this.ProfInfo.Value := this.FitText(p["rank"] != "" ? p["rank"] : "профиль не заполнен", this.SW - 94, 8, 400)
+        this.ProfId.Value := this.FitText(p["id"] != "" ? "ID: " p["id"] : "ID не указан", this.SW - 94, 7, 400)
         ini := ""
         for part in StrSplit(StrReplace(nick, " ", "_"), "_")
             if part != "" && StrLen(ini) < 2
@@ -2509,16 +2510,16 @@ class MainUI {
                 keep[id] := 1
         this.Sel := keep
 
-        this.TitleT.Value := this.CurCat = "" ? "Все бинды" : this.CurCat
+        this.TitleT.Value := this.FitText(this.CurCat = "" ? "Все бинды" : this.CurCat, Min(this.CW - 80, 380), 14, 700)
         this.TitleI.Value := this.CurCat = "" ? Icon.Home : Icon.ForCat(this.CurCat)
-        this.CountT.Move(this.CX + 54 + Min(UI.TextW(this.TitleT.Value, 15, 700), 300) + 16, 31, this.CW - 60, 20)
         n := this.Rows.Length
         if q != ""
-            this.CountT.Value := "Найдено " n " " this.Plural(n, "бинд", "бинда", "биндов") " по запросу «" Trim(this.SearchE.Value) "»"
+            countText := "Найдено " n " " this.Plural(n, "бинд", "бинда", "биндов") " по запросу «" Trim(this.SearchE.Value) "»"
         else {
             k := this.Sel.Count
-            this.CountT.Value := n " " this.Plural(n, "бинд", "бинда", "биндов") (k ? "  ·  " k " " this.Plural(k, "выбран", "выбрано", "выбрано") : "")
+            countText := n " " this.Plural(n, "бинд", "бинда", "биндов") (k ? "  ·  " k " выбрано" : "")
         }
+        this.CountT.Value := this.FitText(countText, this.CW - 56, 8, 400)
         this.RenderNav()
         this.RenderCards()
         this.UpdateDetail()
@@ -2548,7 +2549,7 @@ class MainUI {
             it := this.NavItems[idx]
             nav.item := it
             nav.ic.Value := it.glyph
-            nav.name.Value := it.label
+            nav.name.Value := this.FitText(it.label, this.SW - 94, 9, 500)
             nav.cnt.Value := it.n
             this.PaintNav(A_Index)
         }
@@ -2585,17 +2586,28 @@ class MainUI {
         return out
     }
 
+    static FitText(text, width, size := 9, weight := 400, font := "") {
+        text := String(text)
+        if text = "" || width <= 0
+            return ""
+        if UI.TextW(text, size, weight, font) <= width
+            return text
+        ellipsis := "…"
+        while StrLen(text) && UI.TextW(text "…", size, weight, font) > width
+            text := SubStr(text, 1, -1)
+        return text = "" ? ellipsis : RTrim(text) ellipsis
+    }
+
     static RenderCards() {
         maxOff := Max(0, this.Rows.Length - this.CardN)
         this.Offset := Min(Max(this.Offset, 0), maxOff)
-        parts := ["plate", "title", "key", "cat", "sub1", "sub2", "cnt", "keb", "chk"]
+        parts := ["plate", "title", "key", "cat", "sub1", "sub2", "cnt", "keb", "selBar"]
         loop this.CardN {
             card := this.Cards[A_Index]
             idx := this.Offset + A_Index
             show := idx <= this.Rows.Length
             card.fr.o.Visible := show, card.fr.i.Visible := show
             card.keyf.o.Visible := show, card.keyf.i.Visible := show
-            card.catb.Visible := show
             for k in parts
                 card.%k%.Visible := show
             card.sw.Track.Visible := show, card.sw.Knob.Visible := show, card.sw.Lbl.Visible := show
@@ -2606,32 +2618,35 @@ class MainUI {
             b := Store.Find(this.Rows[idx])
             card.id := b["id"]
             steps := Sender.Plan(b)
-            lines := this.FirstLines(b)
-            maxc := (this.CW - 302) // 6
-            l1 := lines.Length ? lines[1] : "нет строк для отправки"
+            lines := this.FirstLines(b, 2)
+            y := this.LT + (A_Index - 1) * this.STEP
+            l1 := lines.Length ? lines[1] : "Нет строк для отправки"
             l2 := lines.Length > 1 ? lines[2] : ""
             card.plate.Value := Icon.ForCat(b["category"])
-            card.title.Value := b["name"]
+            card.title.Value := this.FitText(b["name"], card.textW, 10, 650)
             card.title.SetFont("c" (b["enabled"] ? Theme.Text : Theme.Muted))
-            card.sub1.Value := StrLen(l1) > maxc ? SubStr(l1, 1, maxc - 1) "…" : l1
-            card.sub1.SetFont("c" (SubStr(l1, 1, 3) = "/me" ? Theme.AccentLine : Theme.Soft))
-            card.sub2.Value := StrLen(l2) > maxc ? SubStr(l2, 1, maxc - 1) "…" : l2
-            ; бейдж клавиши
-            kx := this.CX + 62 + Min(UI.TextW(b["name"], 10, 600), this.CW - 322) + 10
-            kt := b["hotkey"] != "" ? Keys.Pretty(b["hotkey"]) : "—"
-            kw := Max(30, UI.TextW(kt, 8, 700, Theme.Mono) + 16)
-            card.key.Value := kt
-            card.key.SetFont("c" (b["hotkey"] = "" ? Theme.Faint : Theme.Text))
-            ; бейдж категории
-            ct := b["category"]
-            cw2 := UI.TextW(ct, 8, 600) + 16
-            card.cat.Value := ct
-            this.MoveKeyBadge(card, kx, kw, this.LT + (A_Index - 1) * this.STEP, cw2)
+            card.sub1.Value := this.FitText(l1, card.textW, 8, 400)
+            card.sub1.SetFont("c" (SubStr(l1, 1, 3) = "/me" ? Theme.Accent : Theme.Soft))
+            card.sub2.Value := this.FitText(l2, card.textW, 8, 400)
+
+            ; Горячая клавиша — единственный текстовый бейдж в карточке.
+            kt := b["hotkey"] != "" ? StrReplace(Keys.Pretty(b["hotkey"]), " + ", "+") : "—"
+            kw := Min(80, Max(40, UI.TextW(kt, 7, 700, Theme.Mono) + 14))
+            card.key.Value := this.FitText(kt, kw - 8, 7, 700, Theme.Mono)
+            card.key.SetFont("s7 c" (b["hotkey"] = "" ? Theme.Faint : Theme.Text), Theme.Mono)
+            this.MoveKeyBadge(card, card.keyX, kw, y)
+
+            catPrefix := "• "
+            catText := this.FitText(b["category"], card.catW - UI.TextW(catPrefix, 8, 600), 8, 600)
+            card.cat.Value := catPrefix catText
+            card.cat.SetFont("c" Theme.Accent)
+            card.cat.Move(card.catX, y + 23, card.catW, 22)
+
             n := steps.Length
             card.cnt.Value := n " " this.Plural(n, "строка", "строки", "строк")
             card.sw.Set(b["enabled"])
             card.sw.Lbl.Value := b["enabled"] ? "Вкл" : "Выкл"
-            card.sw.Lbl.SetFont("c" (b["enabled"] ? Theme.Soft : Theme.Faint))
+            card.sw.Lbl.SetFont("s8 w500 c" (b["enabled"] ? Theme.Soft : Theme.Faint), Theme.Font)
             this.PaintCard(A_Index)
         }
         n := this.Rows.Length, e := this.E
@@ -2648,7 +2663,7 @@ class MainUI {
                 e.b.Set("Создать бинд", Icon.Add, (*) => Editor.Open("", MainUI.CurCat))
             } else {
                 e.ic.Value := this.CurCat = "" ? Icon.All : Icon.ForCat(this.CurCat)
-                e.t.Value := this.CurCat = "" ? "Здесь пока пусто" : "В «" this.CurCat "» пока нет биндов"
+                e.t.Value := this.CurCat = "" ? "Здесь пока пусто" : "В «" (this.FitText(this.CurCat, this.CW - 300, 11, 700)) "» пока нет биндов"
                 e.s.Value := "Создайте первый бинд или импортируйте код MEDBIND от другого игрока."
                 e.b.Set("Создать бинд", Icon.Add, (*) => Editor.Open("", MainUI.CurCat))
             }
@@ -2656,16 +2671,12 @@ class MainUI {
         this.RenderPager()
     }
 
-    static MoveKeyBadge(card, kx, kw, y, cw2) {
-        card.keyf.o.Move(kx, y + 8, kw, 18)
-        card.keyf.i.Move(kx + 1, y + 9, kw - 2, 16)
-        Theme.Round(card.keyf.o, kw, 18, 6)
-        Theme.Round(card.keyf.i, kw - 2, 16, 5)
-        card.key.Move(kx, y + 8, kw, 18)
-        cx := kx + kw + 8
-        card.catb.Move(cx, y + 8, cw2, 18)
-        Theme.Round(card.catb, cw2, 18, 6)
-        card.cat.Move(cx, y + 8, cw2, 18)
+    static MoveKeyBadge(card, kx, kw, y) {
+        card.keyf.o.Move(kx, y + 23, kw, 22)
+        card.keyf.i.Move(kx + 1, y + 1 + 23, kw - 2, 20)
+        Theme.Round(card.keyf.o, kw, 22, 7)
+        Theme.Round(card.keyf.i, kw - 2, 20, 6)
+        card.key.Move(kx, y + 23, kw, 22)
     }
 
     static RenderPager() {
@@ -2707,7 +2718,11 @@ class MainUI {
         this.PgNext.t.SetFont("c" (cur < pages ? Theme.Muted : Theme.Faint))
         from := n ? this.Offset + 1 : 0
         to := Min(n, this.Offset + this.CardN)
-        this.PgInfo.Value := n ? "Показано " (to - from + 1) " из " n " биндов" : ""
+        infoX := x + total + 12
+        infoW := Max(1, this.CX + this.CW - infoX)
+        this.PgInfo.Move(infoX, this.H - 46, infoW, 28)
+        this.PgInfo.Visible := n > 0 && infoW >= 70
+        this.PgInfo.Value := n ? this.FitText("Показано " (to - from + 1) " из " n " биндов", infoW, 8, 400) : ""
     }
 
     static PaintCard(i) {
@@ -2716,17 +2731,18 @@ class MainUI {
             return
         sel := this.Sel.Has(card.id)
         hv := this.HoverCard = i
-        bg := sel ? Theme.CardSel : hv ? Theme.CardHover : Theme.Card
-        UI.Paint(card.fr.o, sel ? Theme.Accent : hv ? Theme.LineHover : Theme.Line)
+        bg := hv && !sel ? Theme.CardHover : Theme.Card
+        UI.Paint(card.fr.o, sel ? Theme.AccentLine : hv ? Theme.LineHover : Theme.Line)
         UI.Paint(card.fr.i, bg)
-        for k in ["title", "sub1", "sub2", "cnt"]
+        for k in ["plate", "title", "sub1", "sub2", "cat", "cnt", "keb"]
             UI.Paint(card.%k%, bg)
-        UI.Paint(card.plate, Theme.Field)
-        UI.Paint(card.keb, bg)
+        UI.Paint(card.selBar, Theme.Accent)
         UI.Paint(card.sw.Lbl, bg)
-        card.chk.Visible := sel
+        UI.Paint(card.keyf.i, Theme.Field)
+        UI.Paint(card.key, Theme.Field)
+        card.selBar.Visible := sel
         if sel
-            card.chk.Redraw()
+            card.selBar.Redraw()
     }
 
     static Hovered(kind, i, on) {
@@ -2750,87 +2766,84 @@ class MainUI {
         d := this.D
         ids := this.SelectedIds()
         one := ids.Length = 1
-        showOne := [d.keyf.o, d.keyf.i, d.key, d.keb, d.st, d.catb, d.cat, d.dlbl, d.dfr.o, d.dfr.i, d.desc]
-        showStats := [d.s1.ic, d.s1.l, d.s1.v, d.s2.ic, d.s2.l, d.s2.v, d.s3.ic, d.s3.l, d.s3.v, d.s4.ic, d.s4.l, d.s4.v]
-        showFoot := [d.f1l, d.f1v, d.f2l, d.f2v]
-        for c in showOne
+        multi := ids.Length > 1
+        selected := one || multi
+
+        for c in [d.ic, d.name, d.keb]
+            c.Visible := selected
+        for c in [d.keyf.o, d.keyf.i, d.key, d.st, d.cat, d.dlbl, d.desc, d.meta]
             c.Visible := one
-        if d.compact
-            d.dlbl.Visible := false, d.dfr.o.Visible := false, d.dfr.i.Visible := false, d.desc.Visible := false
-        for c in showStats
-            c.Visible := one
-        for c in showFoot
-            c.Visible := one && d.foot
-        d.hint.Visible := !one
-        if !ids.Length {
-            d.ic.Value := Icon.Home
-            d.name.Value := "Ничего не выбрано"
-            d.hint.Value := "Выберите бинд в списке — здесь появятся описание и предпросмотр. Двойной клик — редактор."
-            d.plbl.Value := "Горячие клавиши"
-            d.rv.Set(Preview.Overview())
-            d.main.Show(false), d.b1.Show(false), d.b2.Show(false), d.b3.Show(false)
+        d.hint.Visible := multi
+        d.plbl.Visible := selected
+        d.pbox.Visible := selected
+        d.rv.Visible := selected
+        for c in [d.emptyIcon, d.emptyTitle, d.emptyHint, d.emptyKeys]
+            c.Visible := !selected
+        d.main.Show(selected), d.b1.Show(selected), d.b2.Show(selected), d.b3.Show(selected)
+
+        if !selected {
+            d.emptyTitle.Value := "Выберите бинд"
+            d.emptyHint.Value := "Выберите карточку в списке, чтобы увидеть описание и предпросмотр."
+            d.emptyKeys.Value := "Двойной клик — редактировать  ·  ПКМ — действия"
             return
         }
-        if !one {
+        if multi {
             d.ic.Value := Icon.All
-            d.name.Value := ids.Length " " this.Plural(ids.Length, "бинд", "бинда", "биндов")
-            d.hint.Value := "Ctrl + клик — добавить или убрать, Shift + клик — диапазон, Esc — снять выбор."
-            d.plbl.Value := "Список"
+            d.name.Value := this.FitText(ids.Length " выбрано", d.pw - 82, 12, 700)
+            d.hint.Value := "Ctrl + клик — изменить выбор  ·  Shift + клик — диапазон  ·  Esc — снять выбор"
+            d.plbl.Value := "СПИСОК ВЫБРАННОГО"
             d.rv.Set(Preview.List(ids))
-            d.main.Show(true)
             d.main.Set("Поделиться (" ids.Length ")", Icon.Share, (*) => MainUI.ShareSelected())
-            d.b1.Show(true), d.b1.Set("Перенести", Icon.Move, (*) => MainUI.MoveMenu())
-            d.b2.Show(true), d.b2.Set("Вкл / выкл", Icon.Power, (*) => MainUI.ToggleSelected())
-            d.b3.Show(true), d.b3.Set("Удалить", Icon.Delete)
+            d.b1.Set("Перенести", Icon.Move, (*) => MainUI.MoveMenu())
+            d.b2.Set("Вкл / выкл", Icon.Power, (*) => MainUI.ToggleSelected())
+            d.b3.Set("Удалить", Icon.Delete, (*) => MainUI.DeleteSelected())
             return
         }
+
         b := Store.Find(ids[1])
         px := d.px, pw := d.pw
         d.ic.Value := Icon.ForCat(b["category"])
-        d.name.Value := b["name"]
-        kt := b["hotkey"] != "" ? Keys.Pretty(b["hotkey"]) : "нет клавиши"
-        kw := Min(120, Max(34, UI.TextW(kt, 8, 700, Theme.Mono) + 16))
-        kx := px + 50 + Min(UI.TextW(b["name"], 12, 700), pw - 110) + 10
-        d.keyf.o.Move(kx, 141, kw, 20)
-        d.keyf.i.Move(kx + 1, 142, kw - 2, 18)
-        Theme.Round(d.keyf.o, kw, 20, 6)
-        Theme.Round(d.keyf.i, kw - 2, 18, 5)
-        d.key.Move(kx, 141, kw, 20)
-        d.key.Value := kt
-        d.key.SetFont("c" (b["hotkey"] = "" ? Theme.Faint : Theme.Text))
-        on := b["enabled"]
-        d.st.Value := on ? "● Активен" : "○ Выкл"
-        d.st.SetFont("c" (on ? Theme.Success : Theme.Danger))
-        UI.Paint(d.st, on ? Theme.SuccessBg : Theme.DangerBg)
-        stw := Max(64, UI.TextW(d.st.Value, 8, 700) + 20)
-        d.st.Move(px, 186, stw, 20)
-        Theme.Round(d.st, stw, 20, 10)
-        cw2 := UI.TextW(b["category"], 8, 600) + 16
-        d.catb.Move(px + stw + 8, 186, cw2, 20)
-        Theme.Round(d.catb, cw2, 20, 10)
-        d.cat.Move(px + stw + 8, 186, cw2, 20)
-        d.cat.Value := b["category"]
-        ; описание — первые значимые строки
-        lines := this.FirstLines(b)
+        d.name.Value := this.FitText(b["name"], pw - 82, 12, 700)
+
+        kt := b["hotkey"] != "" ? StrReplace(Keys.Pretty(b["hotkey"]), " + ", "+") : "без клавиши"
+        kw := Min(96, Max(48, UI.TextW(kt, 7, 700, Theme.Mono) + 14))
+        keyText := this.FitText(kt, kw - 8, 7, 700, Theme.Mono)
+        d.keyf.o.Move(px, 183, kw, 22)
+        d.keyf.i.Move(px + 1, 184, kw - 2, 20)
+        Theme.Round(d.keyf.o, kw, 22, 7)
+        Theme.Round(d.keyf.i, kw - 2, 20, 6)
+        d.key.Move(px, 183, kw, 22)
+        d.key.Value := keyText
+        d.key.SetFont("s7 c" (b["hotkey"] = "" ? Theme.Faint : Theme.Text), Theme.Mono)
+
+        enabled := b["enabled"]
+        d.st.Value := enabled ? "● Активен" : "○ Выключен"
+        d.st.SetFont("c" (enabled ? Theme.Success : Theme.Faint))
+        d.st.Move(px + kw + 10, 183, 82, 22)
+        catX := px + kw + 98
+        catW := Max(24, pw - kw - 98)
+        catPrefix := "• "
+        d.cat.Value := catPrefix this.FitText(b["category"], catW - UI.TextW(catPrefix, 8, 600), 8, 600)
+        d.cat.Move(catX, 183, catW, 22)
+        d.cat.SetFont("c" Theme.Accent)
+
+        lines := this.FirstLines(b, 2)
         desc := ""
-        for t in lines
-            desc .= (desc != "" ? "`n" : "") t
+        for line in lines
+            desc .= (desc != "" ? "`n" : "") this.FitText(line, pw - 2, 9, 400)
         d.desc.Value := desc != "" ? desc : "Описания нет — добавьте строки в редакторе."
-        d.plbl.Value := "Предпросмотр"
+        d.plbl.Value := "ПРЕДПРОСМОТР"
         d.rv.Set(Preview.Chat(b))
-        ; статистика
+
         steps := Sender.Plan(b)
-        d.s1.l.Value := "Строк", d.s1.v.Value := steps.Length
-        d.s2.l.Value := "Горячая клавиша", d.s2.v.Value := b["hotkey"] != "" ? Keys.Pretty(b["hotkey"]) : "—"
-        d.s3.l.Value := "Категория", d.s3.v.Value := b["category"]
-        d.s4.l.Value := "Пауза", d.s4.v.Value := Format("{:.1f} с", Store.Num(b["delay"], 1300) / 1000)
-        ; кнопки
-        d.main.Show(true)
+        delayText := Format("{:.1f}", Store.Num(b["delay"], 1300) / 1000) " с"
+        metaText := Preview.Msgs(steps.Length) "   ·   " b["category"] "   ·   " delayText "   ·   " this.When(b["id"])
+        d.meta.Value := this.FitText(metaText, pw, 8, 400)
+
         d.main.Set("Редактировать", Icon.Edit, (*) => MainUI.EditSelected())
-        d.b1.Show(true), d.b1.Set("Дублировать", Icon.Copy, (*) => MainUI.DuplicateSelected())
-        d.b2.Show(true), d.b2.Set("Поделиться", Icon.Share, (*) => MainUI.ShareSelected())
-        d.b3.Show(true), d.b3.Set("Удалить", Icon.Delete)
-        d.f1v.Value := this.When(b["id"])
+        d.b1.Set("Дублировать", Icon.Copy, (*) => MainUI.DuplicateSelected())
+        d.b2.Set("Поделиться", Icon.Share, (*) => MainUI.ShareSelected())
+        d.b3.Set("Удалить", Icon.Delete, (*) => MainUI.DeleteSelected())
         for c in [d.key, d.st, d.cat]
             c.Redraw()
     }

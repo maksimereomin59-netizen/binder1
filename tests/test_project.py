@@ -64,6 +64,21 @@ class ProjectLayoutTests(unittest.TestCase):
         referenced = set(re.findall(r"\bIcon\.(\w+)", bundle))
         self.assertFalse(referenced - defined, f"undefined icons: {sorted(referenced - defined)}")
 
+    def test_bind_cards_and_inspector_do_not_add_text_only_panels(self) -> None:
+        main_ui = build.read_ahk_source("src/ui/MainUI.ahk")
+        self.assertNotIn("catb :=", main_ui)
+        self.assertNotIn("d.catb", main_ui)
+        self.assertNotIn("d.dfr", main_ui)
+        self.assertIn("card.selBar", main_ui)
+        self.assertIn("d.meta :=", main_ui)
+
+    def test_inspector_keeps_single_multi_and_empty_states(self) -> None:
+        main_ui = build.read_ahk_source("src/ui/MainUI.ahk")
+        self.assertIn("Preview.Chat(b)", main_ui)
+        self.assertIn("Preview.List(ids)", main_ui)
+        self.assertIn("d.emptyTitle", main_ui)
+        self.assertIn("this.PgInfo.Move(infoX", main_ui)
+
 
 if __name__ == "__main__":
     unittest.main()
