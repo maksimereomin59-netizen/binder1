@@ -1,4 +1,4 @@
-﻿; ============================================================
+; ============================================================
 ;  MedBind Design System: цвета, иконки, базовые элементы.
 ;  Все окна собираются только из этих компонентов — стиль меняется в одном месте.
 ; ============================================================
@@ -7,39 +7,39 @@ class Theme {
     static Mono := "Consolas"
 
     ; поверхности
-    static Bg := "101216"
-    static Side := "15181E"
-    static Card := "1B1F27"
-    static CardHover := "20252F"
-    static CardSel := "182A2B"
-    static Field := "222731"
-    static FieldHover := "2A303B"
-    static ChatBg := "0C0E12"
-    static Gutter := "1D2129"
+    static Bg := "0B0E13"
+    static Side := "0D1218"
+    static Card := "11161D"
+    static CardHover := "161C25"
+    static CardSel := "0D2129"
+    static Field := "151B24"
+    static FieldHover := "1C2430"
+    static ChatBg := "090C11"
+    static Gutter := "151A21"
     ; линии
-    static Line := "2A303B"
-    static LineHover := "3A4250"
-    static KeyLine := "394150"
+    static Line := "1F2937"
+    static LineHover := "2C3A4C"
+    static KeyLine := "2A3646"
     ; текст
-    static Text := "E3E7EE"
-    static Soft := "B9C1CE"
-    static Muted := "8590A3"
-    static Faint := "5A6475"
+    static Text := "E8EDF4"
+    static Soft := "C2CBD8"
+    static Muted := "8792A4"
+    static Faint := "5A6577"
     ; акценты
-    static Accent := "3CC4B4"
-    static AccentHover := "5BD2C4"
-    static AccentPress := "2FA89A"
-    static AccentInk := "07201D"
-    static AccentLine := "2E8A80"
-    static AccentSoft := "16302F"
-    static AccentSoftHover := "1D3D3B"
-    static AccentSoftPress := "23504C"
+    static Accent := "38C3E8"
+    static AccentHover := "62D2F0"
+    static AccentPress := "2AA9CC"
+    static AccentInk := "05242E"
+    static AccentLine := "2B7E99"
+    static AccentSoft := "0F2B36"
+    static AccentSoftHover := "143A49"
+    static AccentSoftPress := "1A4859"
     static Violet := "8C93E6"
     static VioletSoft := "23264A"
     static VioletSoftHover := "2C3060"
     ; статусы
-    static Success := "54C68E"
-    static SuccessBg := "14291F"
+    static Success := "3DD68C"
+    static SuccessBg := "0E2A1D"
     static Warning := "E2B65E"
     static WarningBg := "2D2515"
     static Danger := "E5696E"
@@ -127,6 +127,11 @@ class Icon {
     static Folder := Chr(0xE8B7)
     static Move := Chr(0xE8DE)
     static Power := Chr(0xE7E8)
+    static More := Chr(0xE712)
+    static Monitor := Chr(0xE7F4)
+    static Home := Chr(0xE80F)
+    static ChevL := Chr(0xE76B)
+    static ChevR := Chr(0xE76C)
 
     static Cat := Map(
         "folder", Chr(0xE8B7), "chat", Chr(0xE8BD), "health", Chr(0xE95E), "heart", Chr(0xEB51),

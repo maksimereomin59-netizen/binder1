@@ -1,4 +1,4 @@
-﻿; ============================================================
+; ============================================================
 ;  Интерактивные компоненты: наведение, кнопки, переключатели,
 ;  списки, поле клавиши, предпросмотр чата (RichEdit)
 ; ============================================================
@@ -210,8 +210,9 @@ class Btn {
 
 ; Переключатель-пилюля с плавным ходом кружка
 class SwitchCtl {
-    __New(g, x, y, w, label, state, bg) {
+    __New(g, x, y, w, label, state, bg, onColor := "") {
         this.State := !!state, this.X := x, this.Y := y, this.OnChange := 0
+        this.OnColor := onColor = "" ? Theme.Accent : onColor
         this.Track := g.AddText("x" x " y" (y + 3) " w40 h22 +0x100 +0x4000000 Background" Theme.Line)
         Theme.Round(this.Track, 40, 22, 11)
         this.Knob := g.AddText("x" (x + 3) " y" (y + 6) " w16 h16 BackgroundFFFFFF")
@@ -233,7 +234,7 @@ class SwitchCtl {
         this.Render(true)
     }
     Render(animate) {
-        UI.Paint(this.Track, this.State ? Theme.Accent : Theme.Line)
+        UI.Paint(this.Track, this.State ? this.OnColor : Theme.Line)
         UI.Paint(this.Knob, this.State ? "FFFFFF" : "C9CED8")
         if animate {
             SetTimer(this.AnimFn, 12)
