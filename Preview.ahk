@@ -1,4 +1,4 @@
-﻿; ============================================================
+; ============================================================
 ;  Предпросмотр в стиле игрового чата (RTF для RichView)
 ; ============================================================
 class Preview {
@@ -17,7 +17,7 @@ class Preview {
             text := Sender.Resolve(st.text)
             body := Rtf.C(4, Format("{:02}", i) "  ")
             if RegExMatch(text, "^(/\S+)(.*)$", &m) {
-                col := RegExMatch(m[1], Preview.RpCmd) ? 6 : 5
+                col := !RegExMatch(m[1], Preview.RpCmd) ? 5 : (m[1] = "/me" ? 5 : m[1] = "/do" ? 7 : 6)
                 body .= "\b" Rtf.C(col, m[1]) "\b0" Rtf.C(1, m[2])
             } else {
                 body .= Rtf.C(3, nick ": ") Rtf.C(1, text)
