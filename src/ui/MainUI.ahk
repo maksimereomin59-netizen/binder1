@@ -1,4 +1,4 @@
-﻿; ============================================================
+; ============================================================
 ;  Главное окно: сайдбар · шапка · список карточек · правая панель
 ;  Композиция рассчитана на 1366×768 … 1920×1080 и выше
 ; ============================================================
@@ -423,10 +423,10 @@ class MainUI {
         s := Store.Data["settings"]
         exe := String(s["gameExe"])
         this.GameName.Value := InStr(exe, "gta_sa") ? "GTA SAMP RP" : exe
-        in := 0
-        try in := WinExist("ahk_exe " exe) != 0
-        this.GameSt.SetFont("c" (in ? Theme.Success : Theme.Faint))
-        this.GameSt.Value := in ? "● Подключен" : "○ Не в игре"
+        gameRunning := false
+        try gameRunning := WinExist("ahk_exe " exe) != 0
+        this.GameSt.SetFont("c" (gameRunning ? Theme.Success : Theme.Faint))
+        this.GameSt.Value := gameRunning ? "● Подключен" : "○ Не в игре"
         for c in [this.GameName, this.GameSt]
             c.Redraw()
     }
