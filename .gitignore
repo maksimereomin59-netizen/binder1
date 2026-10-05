@@ -7,3 +7,7 @@ __pycache__/
 
 # Временные файлы сборки / редакторов
 *.tmp
+
+# Одноразовые архивы проекта для скачивания
+/MedBind-4.0-project.zip
+/MedBind-4.0-project-download.zip

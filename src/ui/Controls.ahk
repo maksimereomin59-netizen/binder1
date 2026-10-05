@@ -146,7 +146,7 @@ class Btn {
         this.Ic := UI.Text(g, "x" p.x " y" p.y " w18 h" p.h " +0x100 +0x200 Center", glyph, bg, size, fg, 400, Icon.Font)
         this.Lb := UI.Text(g, "x" p.x " y" p.y " w" p.w " h" p.h " +0x100 +0x200 Center", label, bg, size, fg, 600)
         this.Parts := [this.Plate, this.Ic, this.Lb]
-        this.Hv := PaintHover(this.Parts, bg, hv, pr)
+        this.Hv := PaintHover([this.Plate], bg, hv, pr)
         for c in this.Parts {
             c.OnEvent("Click", ObjBindMethod(this, "Fire"))
             Hover.Add(c, this.Hv, g.Hwnd)
@@ -318,7 +318,7 @@ class Segmented {
         UI.Frame(g, x, y, w, h, Theme.Field, 8)
         bw := (w - 8) // options.Length
         for i, opt in options {
-            c := UI.Text(g, "x" (x + 4 + (i - 1) * bw) " y" (y + 4) " w" bw " h" (h - 8) " +0x200 +0x100 Center", opt, Theme.Field, 10, Theme.Muted, 600)
+            c := UI.Text(g, "x" (x + 4 + (i - 1) * bw) " y" (y + 4) " w" bw " h" (h - 8) " +0x200 +0x100 Center", opt, Theme.Field, 10, Theme.Muted, 600, "", true)
             Theme.Round(c, bw, h - 8, 6)
             c.OnEvent("Click", this.Chooser(opt))
             this.Btns[opt] := c

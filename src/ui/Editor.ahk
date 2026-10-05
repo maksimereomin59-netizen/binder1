@@ -23,11 +23,11 @@ class Editor {
         g := UI.NewGui(isNew ? "Новый бинд" : "Редактирование бинда")
 
         ; ---------- шапка ----------
-        hi := UI.IconText(g, "x32 y24 w40 h40", isNew ? Icon.Add : Icon.Edit, Theme.AccentSoft, 13, Theme.Accent)
+        hi := UI.IconText(g, "x32 y24 w40 h40", isNew ? Icon.Add : Icon.Edit, Theme.AccentSoft, 13, Theme.Accent, true)
         Theme.Round(hi, 40, 40, 12)
         UI.Text(g, "x86 y22 w420 h26", isNew ? "Новый бинд" : "Редактирование", B, 14, Theme.Text, 700)
         UI.Text(g, "x86 y48 w420 h18", "Каждая строка текста уходит в чат отдельным сообщением", B, 9, Theme.Muted)
-        dirtyT := UI.Text(g, "x520 y30 w132 h22 +0x200 Center", "●  ИЗМЕНЕНО", Theme.WarningBg, 8, Theme.Warning, 700)
+        dirtyT := UI.Text(g, "x520 y30 w132 h22 +0x200 Center", "●  ИЗМЕНЕНО", Theme.WarningBg, 8, Theme.Warning, 700, "", true)
         Theme.Round(dirtyT, 132, 22, 11)
         dirtyT.Visible := false
 

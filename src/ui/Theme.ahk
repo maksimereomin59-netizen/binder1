@@ -7,33 +7,33 @@ class Theme {
     static Mono := "Consolas"
 
     ; поверхности
-    static Bg := "0A0E13"
-    static Side := "0E141A"
-    static Card := "141C24"
-    static CardHover := "19242D"
-    static CardSel := "141C24"
-    static Field := "19232D"
-    static FieldHover := "202C37"
-    static ChatBg := "0C1218"
-    static Gutter := "151D24"
+    static Bg := "090A10"
+    static Side := "0C0D14"
+    static Card := "12141D"
+    static CardHover := "191A25"
+    static CardSel := "20121D"
+    static Field := "171923"
+    static FieldHover := "20222E"
+    static ChatBg := "0B0C12"
+    static Gutter := "151620"
     ; линии
-    static Line := "26323B"
-    static LineHover := "354651"
-    static KeyLine := "334751"
+    static Line := "282A36"
+    static LineHover := "414452"
+    static KeyLine := "393B49"
     ; текст
     static Text := "E8EDF4"
-    static Soft := "C2CBD8"
-    static Muted := "8792A4"
-    static Faint := "5A6577"
+    static Soft := "C9C8D3"
+    static Muted := "9798A8"
+    static Faint := "686A79"
     ; акценты
-    static Accent := "38C3E8"
-    static AccentHover := "62D2F0"
-    static AccentPress := "2AA9CC"
-    static AccentInk := "05242E"
-    static AccentLine := "2B7E99"
-    static AccentSoft := "0F2B36"
-    static AccentSoftHover := "143A49"
-    static AccentSoftPress := "1A4859"
+    static Accent := "F13C79"
+    static AccentHover := "FF6394"
+    static AccentPress := "D92C67"
+    static AccentInk := "FFFFFF"
+    static AccentLine := "D93670"
+    static AccentSoft := "2A121E"
+    static AccentSoftHover := "351522"
+    static AccentSoftPress := "411A2B"
     static Violet := "8C93E6"
     static VioletSoft := "23264A"
     static VioletSoftHover := "2C3060"
@@ -82,8 +82,11 @@ class Theme {
         if !r
             return
         s := A_ScreenDPI / 96
-        d := Round(r * 2 * s)
-        try WinSetRegion("0-0 w" Round(w * s) " h" Round(h * s) " r" d "-" d, ctrl)
+        wp := Round(w * s), hp := Round(h * s)
+        ; Even device-pixel diameters keep left/right corner steps symmetric at 125%/150% DPI.
+        d := Min(2 * Round(r * s), Min(wp, hp))
+        if d > 0
+            try WinSetRegion("0-0 w" wp " h" hp " r" d "-" d, ctrl)
     }
 }
 
@@ -175,17 +178,18 @@ class UI {
         return Ceil(NumGet(sz, 0, "Int") * 96 / A_ScreenDPI)
     }
 
-    static Text(g, opts, text, bg, size := 10, color := "", weight := 400, font := "") {
+    static Text(g, opts, text, bg, size := 10, color := "", weight := 400, font := "", solid := false) {
         g.SetFont("s" size " w" weight " q5 c" (color = "" ? Theme.Text : color), font = "" ? Theme.Font : font)
-        return g.AddText(opts " Background" bg, text)
+        back := solid ? " Background" bg : " BackgroundTrans"
+        return g.AddText(opts back, text)
     }
 
     static Label(g, opts, text, bg) {
         return UI.Text(g, opts, text, bg, 8, Theme.Muted, 700)
     }
 
-    static IconText(g, opts, glyph, bg, size := 10, color := "") {
-        return UI.Text(g, opts " +0x200 Center", glyph, bg, size, color = "" ? Theme.Muted : color, 400, Icon.Font)
+    static IconText(g, opts, glyph, bg, size := 10, color := "", solid := false) {
+        return UI.Text(g, opts " +0x200 Center", glyph, bg, size, color = "" ? Theme.Muted : color, 400, Icon.Font, solid)
     }
 
     ; фоновая плашка; +0x4000000 — не рисуется поверх текста
@@ -270,7 +274,7 @@ class UI {
     static DialogHead(g, w, glyph, title, text := "", tone := "accent") {
         bg := tone = "danger" ? Theme.DangerBg : tone = "warning" ? Theme.WarningBg : tone = "violet" ? Theme.VioletSoft : Theme.AccentSoft
         fg := tone = "danger" ? Theme.Danger : tone = "warning" ? Theme.Warning : tone = "violet" ? Theme.Violet : Theme.Accent
-        b := UI.IconText(g, "x28 y26 w40 h40", glyph, bg, 13, fg)
+        b := UI.IconText(g, "x28 y26 w40 h40", glyph, bg, 13, fg, true)
         Theme.Round(b, 40, 40, 20)
         UI.Text(g, "x84 y24 w" (w - 112) " h26", title, Theme.Bg, 13, Theme.Text, 700)
         if text != ""

@@ -71,7 +71,7 @@ class Dialogs {
         tiles := Map()
         for i, key in Icon.CatKeys {
             col := Mod(i - 1, 6), row := (i - 1) // 6
-            t := UI.IconText(g, "x" (28 + col * 62) " y" (198 + row * 50) " w54 h42 +0x100", Icon.Cat[key], Theme.Field, 13, Theme.Muted)
+            t := UI.IconText(g, "x" (28 + col * 62) " y" (198 + row * 50) " w54 h42 +0x100", Icon.Cat[key], Theme.Field, 13, Theme.Muted, true)
             Theme.Round(t, 54, 42, 8)
             t.OnEvent("Click", Picker_(key))
             tiles[key] := t

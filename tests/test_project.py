@@ -55,6 +55,12 @@ class ProjectLayoutTests(unittest.TestCase):
         bundle = build.render_bundle()
         self.assertNotRegex(bundle, r"(?m)\b(?:try\s+)?in\s*:=")
 
+    def test_powershell_entrypoint_uses_the_current_python_builder(self) -> None:
+        script = (ROOT / "build.ps1").read_text(encoding="utf-8-sig")
+        self.assertIn(r"tools\build.py", script)
+        self.assertIn("'--check'", script)
+        self.assertNotIn("_header.ahk", script)
+
     def test_all_icon_references_are_defined(self) -> None:
         bundle = build.render_bundle()
         theme = build.read_ahk_source("src/ui/Theme.ahk")
