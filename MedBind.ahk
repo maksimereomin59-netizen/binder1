@@ -398,6 +398,18 @@ SafeRunSlot(num) {
     if (CFG["onlyGTA"] && !WinActive("ahk_exe gta_sa.exe"))
         return
     Sleep(10)
+
+    ; === ЖДЁМ ОТПУСКАНИЯ МОДИФИКАТОРОВ ===
+    ; Без этого Alt+1 в GTA SAMP открывает чат как Alt+T и не работает
+    Sleep(20)
+    if (GetKeyState("Alt", "P"))
+        KeyWait "Alt", "L T0.8"
+    if (GetKeyState("Ctrl", "P"))
+        KeyWait "Ctrl", "L T0.8"
+    if (GetKeyState("Shift", "P"))
+        KeyWait "Shift", "L T0.8"
+    Sleep(30)
+
     RunSlotByNum(num, false)
 }
 
